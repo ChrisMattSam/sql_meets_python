@@ -10,6 +10,23 @@ from misc_fxns import set_local_variables
 import pickle
 from time import time
 
+def open_connection(admin = True):
+    """ 
+    Open a connection to the SQL database of interest
+    """
+    from misc_fxns import login_key
+    
+    u,p = 'admin_username', 'admin_password'
+    server, database = login_key(admin_username_key = u, admin_password_key = p)
+    u, p = os.environ.get(u), os.environ.get(p)
+    if admin:
+        conn = pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};SERVER='+server+';DATABASE='+database+';UID='+u+';pwd='+p+';')
+    else:
+        conn = pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};SERVER='+server+';DATABASE='+database+';UID='+u+';Authentication=ActiveDirectoryInteractive;')
+    
+    cursor = conn.cursor()
+    return conn, cursor
+
 def alter_db(query, suppress_print = False):
     """
     Execute one query upon the database that doesnt involve extracting data
@@ -77,18 +94,6 @@ def insert_query(from_df, into_table = 'z_cs.dependency_tracker_bkp'):
     
     query = "INSERT INTO " + into_table + " VALUES " + insert_string[:-1]
     return query
-def open_connection():
-    """ 
-    Open a connection to the SQL database of interest
-    """
-    from misc_fxns import login_key
-    
-    u,p = 'admin_username', 'admin_password'
-    server, database = login_key(user_key = u, password_key = p)
-    u, p = os.environ.get(u), os.environ.get(p)
-    conn = pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};SERVER='+server+';DATABASE='+database+';UID='+u+';pwd='+p+';')
-    cursor = conn.cursor()
-    return conn, cursor
 
 def update_internal_dependencies(location_of_tracker, internal_query):
     """
