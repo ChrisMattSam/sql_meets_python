@@ -10,7 +10,6 @@ import pickle
 from time import time
 from misc_fxns import set_local_variables
 
-"blahb lah bafdflasdkfjasldfasf"
 def open_connection(admin = True):
     """ 
     Open a connection to the SQL database of interest
