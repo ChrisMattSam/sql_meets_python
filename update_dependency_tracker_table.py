@@ -35,24 +35,6 @@ def check_existence(table_name):
         return False
     else:
         return True
-  
-def create_insert_query(from_table, into_table = 'z_cs.dependency_tracker_bkp'):
-    """
-    Create one insert statement comprised of values of a pandas dataframe
-    """
-    
-    insert_string = ""
-    for row in from_table.iterrows():
-        """To make this smarter, could just search the column names of the df and
-        specify number of columns instead of hard-coding"""
-        row = row[1]
-        s1 = "('" + str(row["DataSchema"]) + "','" + str(row["Data"]) + "','" + str(row["DataType"])
-        s2 = "','" + str(row["TrackedItem"]) + "','" + str(row["Notes"]) + "','" + str(row["ViewCreated"])
-        s3 = "','" + str(row["DbFlag"]) + "')"
-        insert_string = insert_string + s1 + s2 + s3 + ","
-    
-    query = "INSERT INTO " + into_table + " VALUES " + insert_string[:-1]
-    return query
 
 def extract_data(query):
     """
@@ -66,14 +48,35 @@ def extract_data(query):
     conn.close()
     return sql_df
 
-def insert_data(from_table, into_table = 'z_cs.dependency_tracker_bkp',
+def insert_data(from_df, into_table = 'z_cs.dependency_tracker_bkp',
                 suppress_print = True):
     """
     Insert data from a pandas datafram into a table within the database
     """
-    query = create_insert_query(from_table, into_table)
-    alter_db(query, suppress_print = suppress_print)
+    query = insert_query(from_df, into_table)
+    if not suppress_print:
+        s1,s2 = query.split('VALUES')
+        print("The query to be executed is: "+s1 + "VALUES" + s2.split(')')[0]+ ')...')
+        
+    alter_db(query, suppress_print = True)
+
+def insert_query(from_df, into_table = 'z_cs.dependency_tracker_bkp'):
+    """
+    Create one insert statement comprised of values of a pandas dataframe
+    """
     
+    insert_string = ""
+    for row in from_df.iterrows():
+        """To make this smarter, could just search the column names of the df and
+        specify number of columns instead of hard-coding"""
+        row = row[1]
+        s1 = "('" + str(row["DataSchema"]) + "','" + str(row["Data"]) + "','" + str(row["DataType"])
+        s2 = "','" + str(row["TrackedItem"]) + "','" + str(row["Notes"]) + "','" + str(row["ViewCreated"])
+        s3 = "','" + str(row["DbFlag"]) + "')"
+        insert_string = insert_string + s1 + s2 + s3 + ","
+    
+    query = "INSERT INTO " + into_table + " VALUES " + insert_string[:-1]
+    return query
 def open_connection():
     """ 
     Open a connection to the SQL database of interest
@@ -138,8 +141,8 @@ if __name__ == "__main__":
         print("Done\n\nTransferring the current database Dependency Tracker into the backup table...")
         if check_existence(backup_tracker) is True: alter_db("TRUNCATE TABLE {}".format(backup_tracker))
         
-        insert_data(from_table = extract_data("SELECT * FROM {}".format(current_tracker)),
-                    into_table = backup_tracker)
+        insert_data(from_df = extract_data("SELECT * FROM {}".format(current_tracker)),
+                    into_table = backup_tracker, suppress_print = False)
                 
         print("Done.\n\nDeleting the contents of the current Dependency Tracker table...")
         alter_db("TRUNCATE TABLE {}".format(current_tracker))

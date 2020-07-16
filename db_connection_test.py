@@ -2,7 +2,7 @@
 """
 Created on Fri Jul  3 09:17:19 2020
 
-@author: FS547CH
+@author: Christopher Sampah
 
 The goal is to open and close a connection to the database to test whether the
 machine is connected to the lia VPN.
