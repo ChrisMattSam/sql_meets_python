@@ -6,10 +6,11 @@ import pandas as pd
 import os
 import numpy as np
 from datetime import datetime
-from misc_fxns import set_local_variables
 import pickle
 from time import time
+from misc_fxns import set_local_variables
 
+"blahb lah bafdflasdkfjasldfasf"
 def open_connection(admin = True):
     """ 
     Open a connection to the SQL database of interest
@@ -20,10 +21,13 @@ def open_connection(admin = True):
     server, database = login_key(admin_username_key = u, admin_password_key = p)
     u, p = os.environ.get(u), os.environ.get(p)
     if admin:
-        conn = pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};SERVER='+server+';DATABASE='+database+';UID='+u+';pwd='+p+';')
+        conn = pyodbc.connect(('DRIVER={ODBC Driver 17 for SQL Server};SERVER='+
+                               server+';DATABASE='+database+';UID='+u+';pwd='+
+                               p+';'))
     else:
-        conn = pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};SERVER='+server+';DATABASE='+database+';UID='+u+';Authentication=ActiveDirectoryInteractive;')
-    
+        conn = pyodbc.connect(('DRIVER={ODBC Driver 17 for SQL Server};SERVER='+
+                               server+';DATABASE='+database+';UID='+u+
+                               ';Authentication=ActiveDirectoryInteractive;'))
     cursor = conn.cursor()
     return conn, cursor
 
@@ -68,7 +72,7 @@ def extract_data(query):
 def insert_data(from_df, into_table = 'z_cs.dependency_tracker_bkp',
                 suppress_print = True):
     """
-    Insert data from a pandas datafram into a table within the database
+    Insert data from a pandas dataframe into a table within the database
     """
     query = insert_query(from_df, into_table)
     if not suppress_print:
