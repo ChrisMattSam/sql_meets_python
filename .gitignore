@@ -1,0 +1,10 @@
+*.sql
+*.csv
+.spyproject
+__pycache__/
+backups
+*.xlsx
+*.pkl
+misc_fxns.py
+Update_Tracker.bat
+Check_Connectivity.bat
